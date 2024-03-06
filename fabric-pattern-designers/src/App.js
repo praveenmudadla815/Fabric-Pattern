@@ -1,7 +1,12 @@
-import "./App.css";
+import React from "react";
+import PatternDesigner from "./components/PatternDesigner";
 
-function App() {
-  return <div className="App"></div>;
-}
+const App = () => {
+  return (
+    <div>
+      <PatternDesigner />
+    </div>
+  );
+};
 
 export default App;
