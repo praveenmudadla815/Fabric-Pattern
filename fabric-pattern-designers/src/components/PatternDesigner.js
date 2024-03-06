@@ -11,7 +11,7 @@ const PatternDesigner = () => {
   };
 
   const handleBrushColorChange = (color) => {
-    setBrushColor(color.hex);
+    setBrushColor(color);
   };
 
   const handleShapeChange = (shape) => {
@@ -39,6 +39,18 @@ const PatternDesigner = () => {
           value={brushColor}
           onChange={(e) => handleBrushColorChange(e.target.value)}
         />
+      </div>
+      <div>
+        <label>Shape:</label>
+        <select
+          value={selectedShape}
+          onChange={(e) => handleShapeChange(e.target.value)}
+        >
+          <option value="free">Free Drawing</option>
+          <option value="rectangle">Rectangle</option>
+          <option value="circle">Circle</option>
+          <option value="eraser">Eraser</option>
+        </select>
       </div>
 
       <Canvas
