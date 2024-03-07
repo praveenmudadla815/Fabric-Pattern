@@ -1,9 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { fabric } from "fabric";
 
-const Canvas = ({ brushSize, brushColor, selectedShape }) => {
+const Canvas = ({
+  brushSize,
+  brushColor,
+  selectedShape,
+  textMode,
+  fontSize,
+}) => {
   const canvasRef = useRef(null);
-
+  const isMouseDown = useRef(false);
   useEffect(() => {
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: 1000,
@@ -18,6 +24,10 @@ const Canvas = ({ brushSize, brushColor, selectedShape }) => {
     };
 
     const handleMouseDown = (options) => {
+      if (isMouseDown.current) {
+        return;
+      }
+      isMouseDown.current = true;
       const { x, y } = options.pointer;
 
       switch (selectedShape) {
@@ -62,11 +72,38 @@ const Canvas = ({ brushSize, brushColor, selectedShape }) => {
           setBrushProperties();
           break;
       }
+      handleTextMode(options, canvas);
     };
 
     const handleMouseUp = () => {
+      isMouseDown.current = false;
       if (selectedShape === "eraser") {
         setBrushProperties();
+      }
+    };
+    const handleTextMode = (options) => {
+      const target = canvas.findTarget(options.e);
+      if (textMode) {
+        const { x, y } = options.pointer;
+        if (target && target.type === "i-text") {
+          target.enterEditing();
+          target.setCoords();
+          target.set("fontSize", fontSize);
+        } else {
+          const text = new fabric.IText("Type here", {
+            left: x,
+            top: y,
+            fontSize: fontSize,
+            fill: brushColor,
+          });
+          canvas.add(text);
+          canvas.isDrawingMode = false;
+          text.set({ editing: true });
+          canvas.renderAll();
+        }
+      } else {
+        canvas.isDrawingMode = selectedShape === "free";
+        canvas.selection = true;
       }
     };
 
@@ -76,7 +113,7 @@ const Canvas = ({ brushSize, brushColor, selectedShape }) => {
     return () => {
       canvas.dispose();
     };
-  }, [brushSize, brushColor, selectedShape]);
+  }, [brushSize, brushColor, selectedShape, textMode, fontSize]);
 
   return <canvas ref={canvasRef} />;
 };
