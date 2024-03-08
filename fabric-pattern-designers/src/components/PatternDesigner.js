@@ -1,4 +1,9 @@
 import React, { useState } from "react";
+import BrushSettings from "./BrushSettings";
+import ColorPicker from "./ColorPicker";
+import ShapeSelector from "./ShapeSelector";
+import TextModeToggle from "./TextModeToggle";
+import FontSizeSelector from "./FontSizeSelector";
 import Canvas from "./Canvas";
 
 const PatternDesigner = () => {
@@ -20,77 +25,64 @@ const PatternDesigner = () => {
     setSelectedShape(shape);
     setTextMode(false);
   };
+
   const handleTextModeToggle = () => {
     setTextMode(!textMode);
-    // Disable other drawing modes when entering text mode
     setSelectedShape("");
   };
+
   const handleFontSizeChange = (e) => {
     setFontSize(parseInt(e.target.value, 10));
   };
+
   return (
-    <div>
+    <div
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <h1>Fabric Pattern Designer</h1>
-      <div>
-        <label>Brush Size:</label>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          value={brushSize}
-          onChange={handleBrushSizeChange}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          marginBlock: "20px",
+          border: "2px solid blue",
+          width: "1000px",
+          backgroundColor: "blue",
+        }}
+      >
+        <BrushSettings
+          brushSize={brushSize}
+          handleBrushSizeChange={handleBrushSizeChange}
         />
-        <span>{brushSize}</span>
-      </div>
-      <div>
-        <label>Brush Color:</label>
-        <input
-          type="color"
-          value={brushColor}
-          onChange={(e) => handleBrushColorChange(e.target.value)}
+        <ColorPicker
+          brushColor={brushColor}
+          handleBrushColorChange={handleBrushColorChange}
         />
-      </div>
-      <div>
-        <label>Shape:</label>
-        <select
-          value={selectedShape}
-          onChange={(e) => handleShapeChange(e.target.value)}
-        >
-          <option value="free">Free Drawing</option>
-          <option value="rectangle">Rectangle</option>
-          <option value="circle">Circle</option>
-          <option value="eraser">Eraser</option>
-        </select>
-      </div>
-      <div>
-        <label>Text Mode:</label>
-        <input
-          type="checkbox"
-          checked={textMode}
-          onChange={handleTextModeToggle}
+        <ShapeSelector
+          selectedShape={selectedShape}
+          handleShapeChange={handleShapeChange}
+        />
+        <TextModeToggle
+          textMode={textMode}
+          handleTextModeToggle={handleTextModeToggle}
+        />
+        <FontSizeSelector
+          fontSize={fontSize}
+          handleFontSizeChange={handleFontSizeChange}
+          textMode={textMode}
         />
       </div>
 
       <div>
-        <label>Font Size:</label>
-        <input
-          type="range"
-          min="8"
-          max="40"
-          value={fontSize}
-          onChange={handleFontSizeChange}
-          disabled={!textMode}
+        <Canvas
+          brushSize={brushSize}
+          brushColor={brushColor}
+          selectedShape={selectedShape}
+          textMode={textMode}
+          fontSize={fontSize}
         />
-        <span>{fontSize}</span>
       </div>
-
-      <Canvas
-        brushSize={brushSize}
-        brushColor={brushColor}
-        selectedShape={selectedShape}
-        textMode={textMode}
-        fontSize={fontSize}
-      />
     </div>
   );
 };
