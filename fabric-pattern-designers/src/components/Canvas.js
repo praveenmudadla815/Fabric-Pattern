@@ -17,7 +17,7 @@ const Canvas = ({
   useEffect(() => {
     canvas.current = new fabric.Canvas(canvasRef.current, {
       width: 1000,
-      height: 300,
+      height: 500,
       backgroundColor: "#ffffff",
     });
 
@@ -129,7 +129,7 @@ const Canvas = ({
   }, [brushSize, brushColor, selectedShape, textMode, fontSize]);
 
   const handleUndo = () => {
-    if (undo.length > 1) {
+    if (undo.length > 1 && typeof undo[0] === "string") {
       const currentState = undo.slice(0, undo.length - 1);
       const lastState = undo[undo.length - 1];
       setRedo([lastState, ...redo]);
@@ -139,6 +139,15 @@ const Canvas = ({
       canvas.current.loadFromJSON(parsedState, () => {
         canvas.current.renderAll();
       });
+    } else if (undo.length > 1 && typeof undo[0] === "object") {
+      const currentState = undo.slice(0, undo.length - 1);
+      const lastState = undo[undo.length - 1];
+      setRedo([lastState, ...redo]);
+      setUndo(currentState);
+
+      // Remove  added image
+      const lastAddedImage = canvas.current.getObjects().pop();
+      canvas.current.remove(lastAddedImage);
     }
   };
 
@@ -154,9 +163,28 @@ const Canvas = ({
       });
     }
   };
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUndo((prev) => [...prev, file]);
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const imgObj = new Image();
+        imgObj.src = event.target.result;
+        imgObj.onload = function () {
+          const image = new fabric.Image(imgObj);
+          canvas.current.add(image);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div>
+      <div style={{ marginBottom: "20px" }}>
+        <input type="file" onChange={handleImageUpload} />
+      </div>
       <div>
         <canvas
           ref={canvasRef}
@@ -171,7 +199,7 @@ const Canvas = ({
         >
           <button
             onClick={handleUndo}
-            disabled={undo.length <= 1}
+            disabled={undo.length === 0}
             style={{
               width: "100px",
               padding: "6px",
